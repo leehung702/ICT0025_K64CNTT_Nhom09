@@ -47,8 +47,5 @@ Chưa có nội dung hoặc biên bản thảo luận được cung cấp. Bổ 
 - Nếu XAMPP trên máy dùng thông tin MySQL khác mặc định, cần đặt biến môi trường kết nối trước khi chạy project.
 - Chức năng quên mật khẩu chưa gửi liên kết vì project chưa cấu hình email.
 - Chưa có kết quả kiểm thử đăng ký/đăng nhập với MySQL trên máy.
-- Chưa có thông tin phân công, đóng góp cụ thể và kết quả thảo luận để hoàn thiện báo cáo.
 
-## Lưu ý bảo mật
 
-Đây là project học tập, không phải hệ thống cấp CCCD. Mã hồ sơ tự tạo không phải số CCCD; chỉ dùng dữ liệu giả khi trình diễn và kiểm thử. Mật khẩu lưu dạng băm, không lưu mật khẩu gốc. Không ghi mật khẩu cơ sở dữ liệu, khóa truy cập hoặc thông tin bí mật vào bài nộp.
