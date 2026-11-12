@@ -18,8 +18,7 @@
 | Lê Tiến Hùng | dang_ky | hoàn thành |
 | Lò Thị Huệ | dang_nhap | hoàn thành |
 | Sụ li Ta Phim Ma Vông | index | hoàn thành |
-| Bua Văn Văn Lo Khăm | ket
-_noi | hoàn thành |
+| Bua Văn Văn Lo Khăm | ket_noi | hoàn thành |
 | Sổm Mai Đao Thạ Kun | dang_xuat | hoàn thành |
 
 ## Kết quả thảo luận
