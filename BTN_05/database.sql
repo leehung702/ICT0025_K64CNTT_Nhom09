@@ -1,5 +1,3 @@
--- BTN 05: Quản lý sinh viên và điểm học phần
-
 CREATE DATABASE IF NOT EXISTS quan_ly_sinh_vien
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE quan_ly_sinh_vien;
@@ -37,8 +35,6 @@ CREATE TABLE IF NOT EXISTS diem (
     ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
--- Dữ liệu nền để chọn sinh viên/học phần. 
--- Bảng diem để trống để kiểm thử danh sách rỗng.
 INSERT IGNORE INTO lop (ma_lop, ten_lop) VALUES
   ('CNTT01', 'Công nghệ thông tin 01'),
   ('CNTT02', 'Công nghệ thông tin 02');
