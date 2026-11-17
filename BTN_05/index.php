@@ -9,7 +9,9 @@ function e(mixed $value): string
 }
 
 $errors = [];
-$success = '';
+$success = isset($_GET['added'])
+    ? 'Đã lưu điểm học phần thành công.'
+    : '';
 $selectedStudent = '';
 $selectedCourse = '';
 $scoreInput = '';
@@ -32,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        // Kiểm tra khóa ngoại trong dữ liệu POST.
+        // Kiểm tra khóa ngoại trong dữ liệu POST, không tin các giá trị gửi từ trình duyệt.
         $checkStudent = $pdo->prepare('SELECT COUNT(*) FROM sinhvien WHERE ma_sv = :ma_sv');
         $checkStudent->execute(['ma_sv' => $selectedStudent]);
         $checkCourse = $pdo->prepare('SELECT COUNT(*) FROM hocphan WHERE ma_hp = :ma_hp');
@@ -57,7 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'ma_hp' => $selectedCourse,
                 'diem_so' => number_format((float)$scoreInput, 2, '.', ''),
             ]);
-            $success = 'Đã lưu điểm học phần thành công.';
+            header('Location: index.php?added=1');
+exit;
             $selectedStudent = $selectedCourse = $scoreInput = '';
         } catch (PDOException $exception) {
             if ($exception->getCode() === '23000') {
