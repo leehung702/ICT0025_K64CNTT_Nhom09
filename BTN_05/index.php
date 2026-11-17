@@ -19,7 +19,6 @@ $studentNameInput = '';
 $selectedCourse = '';
 $scoreInput = '';
 
-// Xóa bằng POST và prepared statement; sau thao tác chuyển hướng để refresh không gửi lại form.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $idToDelete = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
     if ($idToDelete === false || $idToDelete === null || $idToDelete < 1) {
@@ -53,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
     }
 
     if (!$errors) {
-        // Nhận tên người dùng nhập, tìm mã sinh viên thực trong CSDL bằng prepared statement.
         $findStudent = $pdo->prepare('SELECT ma_sv FROM sinhvien WHERE ho_ten = :ho_ten ORDER BY ma_sv');
         $findStudent->execute(['ho_ten' => $studentNameInput]);
         $studentMatches = $findStudent->fetchAll();
@@ -65,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
             $selectedStudent = (string)$studentMatches[0]['ma_sv'];
         }
 
-        // Kiểm tra lại khóa ngoại trước khi INSERT.
         $checkCourse = $pdo->prepare('SELECT COUNT(*) FROM hocphan WHERE ma_hp = :ma_hp');
         $checkCourse->execute(['ma_hp' => $selectedCourse]);
         if ((int)$checkCourse->fetchColumn() === 0) {
@@ -75,7 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delet
 
     if (!$errors) {
         try {
-            // PREPARE + tham số giúp tách dữ liệu khỏi câu lệnh SQL.
             $insert = $pdo->prepare(
                 'INSERT INTO diem (ma_sv, ma_hp, diem_so)
                  VALUES (:ma_sv, :ma_hp, :diem_so)'
