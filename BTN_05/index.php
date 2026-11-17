@@ -9,20 +9,39 @@ function e(mixed $value): string
 }
 
 $errors = [];
-$success = isset($_GET['added'])
-    ? 'Đã lưu điểm học phần thành công.'
-    : '';
+$successMessages = [
+    'added' => 'Đã lưu điểm học phần thành công.',
+    'deleted' => 'Đã xóa điểm học phần thành công.',
+];
+$success = $successMessages[(string)($_GET['status'] ?? '')] ?? '';
 $selectedStudent = '';
+$studentNameInput = '';
 $selectedCourse = '';
 $scoreInput = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $selectedStudent = trim((string)($_POST['ma_sv'] ?? ''));
+// Xóa bằng POST và prepared statement; sau thao tác chuyển hướng để refresh không gửi lại form.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    $idToDelete = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
+    if ($idToDelete === false || $idToDelete === null || $idToDelete < 1) {
+        $errors[] = 'Mã điểm cần xóa không hợp lệ.';
+    } else {
+        $delete = $pdo->prepare('DELETE FROM diem WHERE id = :id');
+        $delete->execute(['id' => $idToDelete]);
+        if ($delete->rowCount() > 0) {
+            header('Location: index.php?status=deleted');
+            exit;
+        }
+        $errors[] = 'Không tìm thấy điểm cần xóa.';
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') !== 'delete') {
+    $studentNameInput = trim((string)($_POST['ten_sinh_vien'] ?? ''));
     $selectedCourse = trim((string)($_POST['ma_hp'] ?? ''));
     $scoreInput = trim((string)($_POST['diem_so'] ?? ''));
 
-    if ($selectedStudent === '') {
-        $errors[] = 'Vui lòng chọn sinh viên.';
+    if ($studentNameInput === '') {
+        $errors[] = 'Vui lòng nhập tên sinh viên.';
     }
     if ($selectedCourse === '') {
         $errors[] = 'Vui lòng chọn học phần.';
@@ -34,14 +53,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$errors) {
-        // Kiểm tra khóa ngoại trong dữ liệu POST, không tin các giá trị gửi từ trình duyệt.
-        $checkStudent = $pdo->prepare('SELECT COUNT(*) FROM sinhvien WHERE ma_sv = :ma_sv');
-        $checkStudent->execute(['ma_sv' => $selectedStudent]);
+        // Nhận tên người dùng nhập, tìm mã sinh viên thực trong CSDL bằng prepared statement.
+        $findStudent = $pdo->prepare('SELECT ma_sv FROM sinhvien WHERE ho_ten = :ho_ten ORDER BY ma_sv');
+        $findStudent->execute(['ho_ten' => $studentNameInput]);
+        $studentMatches = $findStudent->fetchAll();
+        if (count($studentMatches) === 0) {
+            $errors[] = 'Không tìm thấy sinh viên này. Hãy nhập/chọn tên có trong danh sách gợi ý.';
+        } elseif (count($studentMatches) > 1) {
+            $errors[] = 'Có nhiều sinh viên trùng tên; hãy dùng tên duy nhất trong danh sách.';
+        } else {
+            $selectedStudent = (string)$studentMatches[0]['ma_sv'];
+        }
+
+        // Kiểm tra lại khóa ngoại trước khi INSERT.
         $checkCourse = $pdo->prepare('SELECT COUNT(*) FROM hocphan WHERE ma_hp = :ma_hp');
         $checkCourse->execute(['ma_hp' => $selectedCourse]);
-        if ((int)$checkStudent->fetchColumn() === 0) {
-            $errors[] = 'Sinh viên được chọn không tồn tại.';
-        }
         if ((int)$checkCourse->fetchColumn() === 0) {
             $errors[] = 'Học phần được chọn không tồn tại.';
         }
@@ -59,9 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'ma_hp' => $selectedCourse,
                 'diem_so' => number_format((float)$scoreInput, 2, '.', ''),
             ]);
-            header('Location: index.php?added=1');
-exit;
-            $selectedStudent = $selectedCourse = $scoreInput = '';
+            header('Location: index.php?status=added');
+            exit;
         } catch (PDOException $exception) {
             if ($exception->getCode() === '23000') {
                 $errors[] = 'Sinh viên này đã có điểm cho học phần đã chọn.';
@@ -127,15 +152,15 @@ function classification(float $score): string
             <div class="message error">Cần có ít nhất một sinh viên và một học phần trong CSDL trước khi nhập điểm.</div>
         <?php else: ?>
         <form method="post" action="index.php">
-            <label for="ma_sv">Sinh viên <span>*</span></label>
-            <select id="ma_sv" name="ma_sv" required>
-                <option value="">-- Chọn sinh viên --</option>
+            <label for="ten_sinh_vien">Tên sinh viên <span>*</span></label>
+            <input id="ten_sinh_vien" name="ten_sinh_vien" type="text" list="danh_sach_sinh_vien"
+                   value="<?= e($studentNameInput) ?>" placeholder="Gõ tên sinh viên..." autocomplete="off" required>
+            <datalist id="danh_sach_sinh_vien">
                 <?php foreach ($students as $student): ?>
-                    <option value="<?= e($student['ma_sv']) ?>" <?= (string)$selectedStudent === (string)$student['ma_sv'] ? 'selected' : '' ?>>
-                        <?= e($student['ho_ten']) ?> · <?= e($student['ten_lop']) ?>
-                    </option>
+                    <option value="<?= e($student['ho_ten']) ?>" label="Lớp <?= e($student['ten_lop']) ?>"></option>
                 <?php endforeach; ?>
-            </select>
+            </datalist>
+            <p class="hint">Có thể gõ tên; chọn tên có sẵn trong gợi ý để khớp với dữ liệu sinh viên.</p>
 
             <label for="ma_hp">Học phần <span>*</span></label>
             <select id="ma_hp" name="ma_hp" required>
@@ -151,7 +176,7 @@ function classification(float $score): string
             <input id="diem_so" name="diem_so" type="number" min="0" max="10" step="0.01"
                    value="<?= e($scoreInput) ?>" placeholder="Ví dụ: 8.5" required>
             <button type="submit">Lưu điểm</button>
-            <p class="hint">Cả ba trường đều bắt buộc. Mỗi sinh viên chỉ có một kết quả cho mỗi học phần trong phiên bản bài tập này.</p>
+            <p class="hint">Tên sinh viên, học phần và điểm đều bắt buộc. Mỗi sinh viên chỉ có một kết quả cho mỗi học phần trong phiên bản bài tập này.</p>
         </form>
         <?php endif; ?>
     </section>
@@ -165,7 +190,7 @@ function classification(float $score): string
         <?php else: ?>
         <div class="table-wrap">
             <table>
-                <thead><tr><th>#</th><th>Sinh viên</th><th>Lớp</th><th>Học phần</th><th>Điểm</th><th>Xếp loại</th><th>Ngày tạo</th></tr></thead>
+                <thead><tr><th>#</th><th>Sinh viên</th><th>Lớp</th><th>Học phần</th><th>Điểm</th><th>Xếp loại</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
                 <tbody>
                 <?php foreach ($records as $record): $score = (float)$record['diem_so']; ?>
                     <tr>
@@ -176,6 +201,14 @@ function classification(float $score): string
                         <td><strong><?= e(number_format($score, 2)) ?></strong></td>
                         <td><span class="badge"><?= e(classification($score)) ?></span></td>
                         <td><?= e($record['ngay_tao']) ?></td>
+                        <td>
+                            <form method="post" action="index.php" class="delete-form"
+                                  onsubmit="return confirm('Bạn chắc chắn muốn xóa điểm này?');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="<?= e($record['id']) ?>">
+                                <button type="submit" class="delete-button">Xóa</button>
+                            </form>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
