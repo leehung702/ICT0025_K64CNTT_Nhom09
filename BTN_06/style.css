@@ -1,0 +1,146 @@
+/* ===== Biến giao diện (sáng / tối tự động theo hệ thống) ===== */
+:root{
+  --bg:#f3f5fb; --surface:#ffffff; --surface-2:#f7f8fc; --border:#e3e7f1;
+  --text:#172033; --muted:#64748b;
+  --primary:#4f46e5; --primary-hover:#4338ca; --primary-soft:#eef0ff;
+  --success:#15803d; --success-hover:#116b34; --success-soft:#ecfdf3; --success-border:#bfe8cf;
+  --danger:#dc2626; --danger-hover:#b91c1c; --danger-soft:#fef2f2; --danger-border:#f5c2c2;
+  --ga-bg:rgba(22,163,74,.13); --ga-fg:#15803d;
+  --gb-bg:rgba(59,130,246,.13); --gb-fg:#1d4ed8;
+  --gc-bg:rgba(245,158,11,.16); --gc-fg:#b45309;
+  --gd-bg:rgba(239,68,68,.14); --gd-fg:#b91c1c;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 10px 30px rgba(16,24,40,.06);
+  font-family:Inter,"Segoe UI",ui-sans-serif,system-ui,-apple-system,Roboto,sans-serif;
+  color:var(--text); background:var(--bg); font-synthesis:none; color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e1320; --surface:#161c2d; --surface-2:#1b2237; --border:#273049;
+    --text:#e8ecf6; --muted:#93a0ba;
+    --primary:#7c83ff; --primary-hover:#9097ff; --primary-soft:#232b4d;
+    --success:#34d399; --success-hover:#10b981; --success-soft:#0f2a22; --success-border:#1d5a45;
+    --danger:#f87171; --danger-hover:#ef4444; --danger-soft:#2d1519; --danger-border:#6b2a2e;
+    --ga-fg:#4ade80; --gb-fg:#93c5fd; --gc-fg:#fbbf24; --gd-fg:#fca5a5;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25);
+  }
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);line-height:1.5}
+code{background:var(--surface-2);padding:1px 6px;border-radius:6px;font-size:.9em}
+
+.container{max-width:1120px;margin:0 auto;padding:32px 20px 24px}
+.container-narrow{max-width:720px}
+
+/* ===== Hero ===== */
+.hero{
+  position:relative;overflow:hidden;color:#fff;border-radius:22px;padding:34px 38px;margin-bottom:22px;
+  background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 55%,#0ea5e9 100%);
+  box-shadow:0 18px 40px rgba(79,70,229,.28);
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.28),rgba(255,255,255,0) 70%);
+}
+.hero-compact{padding:26px 32px}
+.eyebrow{font-size:12px;letter-spacing:.14em;font-weight:800;color:#dbe4ff;margin:0 0 10px}
+.hero h1{font-size:clamp(25px,4vw,38px);line-height:1.15;margin:0 0 10px;position:relative}
+.hero p:last-child{margin:0;color:#ecf0ff;position:relative}
+.hero code{background:rgba(255,255,255,.2);color:#fff}
+
+/* ===== Thống kê ===== */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.stat{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.stat strong{display:block;font-size:24px;line-height:1.1}
+.stat span:last-child{font-size:13px;color:var(--muted)}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:21px;background:var(--primary-soft)}
+
+/* ===== Thẻ / lưới ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:20px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+  margin-bottom:20px;box-shadow:var(--shadow);min-width:0}
+.grid .card{margin-bottom:0}
+.card h2{font-size:19px;margin:0 0 16px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.card-head h2{margin:0}
+
+/* ===== Form ===== */
+.form{display:grid;grid-template-columns:1fr;gap:8px}
+label{font-weight:650;font-size:14px;margin-top:6px}
+label span{color:var(--danger)}
+input,select{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--surface-2);color:var(--text);font:inherit;transition:border-color .15s,box-shadow .15s}
+input::placeholder{color:var(--muted)}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-soft);background:var(--surface)}
+.hint{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+/* ===== Nút ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;
+  border-radius:var(--radius-sm);padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;
+  text-decoration:none;width:fit-content;margin-top:6px;transition:background .15s,transform .05s,border-color .15s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:var(--primary-soft);color:var(--primary)}.btn-secondary:hover{border-color:var(--primary)}
+.btn-ghost{background:transparent;color:var(--primary);border-color:var(--border)}.btn-ghost:hover{border-color:var(--primary);background:var(--primary-soft)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:var(--danger-hover)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:var(--success-hover)}
+.btn-sm{padding:7px 12px;font-size:13px;margin-top:0}
+
+/* ===== Thông báo ===== */
+.alert{padding:13px 16px;border-radius:12px;margin-bottom:18px;font-size:14px;border:1px solid;border-left-width:5px}
+.alert ul{margin:6px 0 0;padding-left:20px}
+.alert-success{background:var(--success-soft);color:var(--success);border-color:var(--success-border)}
+.alert-error{background:var(--danger-soft);color:var(--danger);border-color:var(--danger-border)}
+
+/* ===== Tabs + tìm kiếm ===== */
+.tabs{display:flex;gap:8px;margin:12px 0 14px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;background:var(--surface-2);
+  color:var(--muted);font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--border)}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.count{background:rgba(127,127,127,.22);border-radius:99px;padding:1px 8px;font-size:12px}
+.tab.active .count{background:rgba(255,255,255,.25)}
+.search{max-width:290px;padding:9px 13px}
+
+/* ===== Bảng ===== */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+th{background:var(--surface-2);color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+.num,.muted-cell{color:var(--muted)}
+.score{font-size:15px}
+.person{display:inline-flex;align-items:center;gap:10px}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;
+  background:var(--primary-soft);color:var(--primary)}
+.badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:800}
+.grade-a{background:var(--ga-bg);color:var(--ga-fg)}
+.grade-b{background:var(--gb-bg);color:var(--gb-fg)}
+.grade-c{background:var(--gc-bg);color:var(--gc-fg)}
+.grade-d{background:var(--gd-bg);color:var(--gd-fg)}
+.col-actions{width:1%}
+.actions{display:flex;align-items:center;gap:8px}
+.inline-form{margin:0;display:inline-block}
+
+/* ===== Trạng thái rỗng ===== */
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:38px 16px;
+  color:var(--muted);background:var(--surface-2);border:1px dashed var(--border);border-radius:14px}
+.empty strong{color:var(--text)}
+.empty-icon{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--primary-soft);
+  color:var(--primary);font-size:22px}
+
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px}
+
+@media (prefers-color-scheme: dark){
+  .btn-success{color:#052e1b}.btn-danger{color:#2d0a0a}.btn-primary{color:#0e1320}.tab.active{color:#0e1320}.tab.active .count{background:rgba(0,0,0,.2)}
+}
+
+@media (max-width:640px){
+  .container{padding:20px 14px}
+  .hero{padding:26px 22px;border-radius:18px}
+  .search{max-width:none;width:100%}
+}
