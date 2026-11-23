@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    actor GV as Giáo vụ / Sinh viên
+    participant TT as Trình duyệt
+    participant PHP as index.php
+    participant DB as MySQL (diem, sinhvien, hocphan, lop)
+
+    GV->>TT: Nhập từ khóa, chọn học phần / xếp loại / trạng thái
+    TT->>PHP: GET index.php?q=...&hp=...&xl=...&tt=...
+    PHP->>PHP: Chuẩn hóa tham số (doc_id, danh sách giá trị cho phép, like_escape)
+    PHP->>DB: SELECT diem JOIN sinhvien, hocphan, lop WHERE ... (prepared)
+    DB-->>PHP: các dòng điểm
+    PHP->>PHP: Thống kê: số bản ghi, ĐTB, số lượng từng xếp loại
+    alt Có kết quả
+        PHP-->>TT: HTML bảng điểm (dữ liệu qua htmlspecialchars)
+    else Không có kết quả
+        PHP-->>TT: Thông báo "Không có bản ghi nào khớp bộ lọc"
+    end
+    TT-->>GV: Hiển thị kết quả tra cứu

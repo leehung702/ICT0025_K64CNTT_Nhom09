@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor GV as Giáo vụ / Giảng viên
+    participant TT as Trình duyệt
+    participant PHP as index.php
+    participant FN as functions.php
+    participant DB as MySQL (bảng diem)
+
+    GV->>TT: Chọn sinh viên, học phần, nhập điểm QT + điểm thi
+    TT->>PHP: POST action=create/update (+ csrf token)
+    PHP->>PHP: Kiểm tra CSRF và ID (doc_id)
+    alt CSRF sai
+        PHP-->>TT: Redirect + thông báo "Phiên không hợp lệ"
+    else CSRF đúng
+        PHP->>FN: parse_diem(diem_qt), parse_diem(diem_thi)
+        FN-->>PHP: giá trị hoặc lỗi (âm, >10, không phải số)
+        alt Dữ liệu sai hoặc chỉ nhập 1 ô
+            PHP-->>TT: Hiển thị lại form + danh sách lỗi (không ghi CSDL)
+        else Dữ liệu hợp lệ
+            PHP->>DB: SELECT kiểm tra SV, HP tồn tại và chưa trùng (prepared)
+            DB-->>PHP: kết quả
+            PHP->>FN: tinh_diem_tk(qt, thi), xep_loai(tk)
+            FN-->>PHP: diem_tk, xep_loai (A..F)
+            PHP->>DB: INSERT / UPDATE diem ... trang_thai = Da_nhap (prepared)
+            DB-->>PHP: thành công (rowCount)
+            PHP-->>TT: Redirect GET index.php + thông báo thành công
+            TT-->>GV: Danh sách điểm cập nhật (không gửi lại form khi F5)
+        end
+    end

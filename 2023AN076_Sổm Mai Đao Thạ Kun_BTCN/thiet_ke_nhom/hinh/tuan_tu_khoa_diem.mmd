@@ -1,0 +1,21 @@
+sequenceDiagram
+    autonumber
+    actor GV as Giáo vụ
+    participant TT as Trình duyệt
+    participant PHP as index.php
+    participant DB as MySQL (bảng diem)
+
+    GV->>TT: Bấm "Khóa" trên dòng điểm
+    TT->>GV: Hộp xác nhận (confirm)
+    alt Chọn Cancel
+        TT-->>GV: Không gửi yêu cầu, dữ liệu giữ nguyên
+    else Chọn OK
+        TT->>PHP: POST action=lock, id (+ csrf token)
+        PHP->>DB: UPDATE diem SET trang_thai='Da_khoa' WHERE id=? AND trang_thai='Da_nhap'
+        DB-->>PHP: rowCount
+        alt rowCount = 1
+            PHP-->>TT: Redirect + "Đã khóa điểm"
+        else rowCount = 0
+            PHP-->>TT: Redirect + "Không khóa được (sai trạng thái hoặc ID không tồn tại)"
+        end
+    end

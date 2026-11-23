@@ -1,0 +1,27 @@
+stateDiagram-v2
+    direction TB
+    [*] --> Chua_nhap : Tạo bản ghi,<br/>để trống điểm
+    [*] --> Da_nhap : Tạo bản ghi,<br/>nhập đủ điểm hợp lệ
+
+    Chua_nhap --> Da_nhap : Nhập đủ QT + thi<br/>hợp lệ (0 đến 10)
+    Da_nhap --> Da_nhap : Sửa điểm
+    Da_nhap --> Da_khoa : Khóa điểm
+
+    Chua_nhap --> Da_xoa : Xóa bản ghi
+    Da_nhap --> Da_xoa : Xóa bản ghi
+    Da_xoa --> [*]
+    Da_khoa --> [*] : Kết thúc
+
+    Da_xoa : Đã xóa khỏi CSDL
+
+    note right of Chua_nhap
+        diem_qt, diem_thi, diem_tk, xep_loai là NULL
+    end note
+    note right of Da_nhap
+        diem_tk = 0.4 x diem_qt + 0.6 x diem_thi
+        xep_loai thuộc A, B, C, D, F
+        (tính lại mỗi lần sửa điểm)
+    end note
+    note right of Da_khoa
+        Không sửa, không xóa
+    end note
